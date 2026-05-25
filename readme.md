@@ -77,7 +77,7 @@ This tools takes advantages of Google Dorks ;
 __Tested and confirmed functioning for:__
 * [x] LinkedIn: Posts (text) and phone extraction from photos/CV (image)
 * [x] Instagram: Profile description (text)
-* [ ] ~~Facebook~~
+* [ ] Facebook: posts (text), ~~comments (text)~~
 * [ ] ~~Reddit~~
 * [ ] ~~Twitter~~
 * [ ] ~~GitHub~~
