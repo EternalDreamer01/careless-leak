@@ -1,10 +1,10 @@
-# Careless Leak
+# Careless Leak Lookup
 
 <!-- ![google-dark](./google-dark.jpeg) -->
 
 ## Overview
 
-Careless Leak is a **simple reverse phone lookup** ;
+Careless Leak Lookup is a **simple reverse phone lookup** ;
 that is, a tool to obtain information about the subscriber (owner) of the phone number.
 
 Please read [Disclaimer](#disclaimer), [Is the user notified about this ?](#is-the-user-notified-about-this-) and [Is it legal ?](#is-it-legal-).
@@ -47,10 +47,8 @@ LINKEDIN_PASSWORD=<your-password>
 ## Usage
 
 __Supports international phone format only__
-
-Raw format is digits only ;
 ```sh
-$ ./main.py "+44 808 157 0192"
+$ ./c3l.py "+44 808 157 0192"
 ```
 
 ## FAQ
@@ -67,8 +65,9 @@ You alone bear full responsibility for any misuse or damage resulting from the u
 
 ## How it works
 This tools takes advantages of Google Dorks ;
-1. in manual mode, it would simply open the results on your default browser,
-2. in automatic mode :
+1. **manual mode** would simply open the results on your default browser,
+2. **automatic mode** would use selenium for browser interaction and, tesseract for text extraction from images :
+
 * It would first look at the images, extract their text in an attempt to find the phone number,
 * Then, it would look at *All* results (links), where  :
 	* LinkedIn links are inspected in depth through their posts
