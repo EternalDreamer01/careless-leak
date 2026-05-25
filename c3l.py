@@ -125,7 +125,8 @@ if __name__ == "__main__":
 
 	params = {
 		# "cx": "a2a04e3ac38de4635",
-		"q": '"'+ '" OR "'.join(phone_list) +'"' + (' site:'+ ' OR site:'.join(SITES) if SITES else ''),
+		"q": '"'+ '" OR "'.join(phone_list) +'"'+ (' site:'+ ' OR site:'.join(SITES) if SITES else ''),
+		# "as_sitesearch": ' '.join(SITES)
 		# "udm": 2 # For Google Images, add 'udm=2'
 	}
 
