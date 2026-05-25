@@ -1,0 +1,6 @@
+argparse
+phonenumbers
+selenium
+requests
+pytesseract
+dotenv
