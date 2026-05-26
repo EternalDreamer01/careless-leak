@@ -170,6 +170,7 @@ if __name__ == "__main__":
 						args.full = True
 
 			# Check images
+			image_hrefs = []
 			if True:
 				# params["udm"] = 2 # For Google Images, add 'udm=2'
 				browser.get(search_url+"&udm=2")
@@ -202,6 +203,10 @@ if __name__ == "__main__":
 					phone_number_test(text, phone_list, picture_url, args.full)
 					# webdriver.ActionChains(browser).send_keys(Keys.ESCAPE).perform()
 					break
+ 
+				results = browser.find_elements(By.CSS_SELECTOR, "a.EZAeBe")
+				if results:
+					image_hrefs = [(a.text, a.get_attribute("href") or a.get_property("href")) for a in results]
 
 				# TODO: Implement checking on the remote page itself, not only on the image
 
@@ -285,12 +290,18 @@ if __name__ == "__main__":
 					if not found:
 						oprint("LinkedIn profile(s) associated with the phone number:")
 						for title, href, desc, country in linkedin_hrefs:
-							print(f"  {title:<30}: {href}")
+							print(f"  {title:<30} {href}")
 
 				if filtered_hrefs:
 					oprint("Phone number found")
 					filtered_hrefs = sorted(filtered_hrefs, key=lambda x: x[3], reverse=True) # Sort by country match
 					for title, href, desc, country in filtered_hrefs:
+						print(f"  {title:<30} {href}")
+
+				elif image_hrefs:
+					oprint("Phone number found:")
+					# image_hrefs = sorted(image_hrefs, key=lambda x: x[1], reverse=True) # Sort by href
+					for title, href in image_hrefs:
 						print(f"  {title:<30} {href}")
 
 		except KeyboardInterrupt:
