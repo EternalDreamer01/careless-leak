@@ -123,6 +123,8 @@ if __name__ == "__main__":
 	number_type = pn.phonenumberutil.number_type(args.phone)
 	if number_type == pn.PhoneNumberType.MOBILE:
 		oprint("Mobile number")
+	elif number_type == pn.PhoneNumberType.FIXED_LINE_OR_MOBILE:
+		oprint("Mobile or fixed-line number")
 	else:
 		wprint("Not a mobile number:", pn.PhoneNumberType.to_string(number_type),
         	"\nThis phone number isn't associated with a mobile device, so it might be less likely to be found on social media profiles or associated with a physical person.\n"
