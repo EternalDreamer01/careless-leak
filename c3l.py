@@ -3,7 +3,7 @@
 import webbrowser
 from sys import exit, stderr
 from urllib.parse import urlencode
-import argparse
+from argparse import ArgumentParser, ArgumentTypeError, RawTextHelpFormatter
 import phonenumbers as pn
 import re
 import os
@@ -26,16 +26,26 @@ def phone_validation(ps: str) -> str:
 			wprint(f"Incomplete phone number, assumed '{ps}'")
 		p = pn.parse(ps, None)
 	except pn.phonenumberutil.NumberParseException:
-		raise argparse.ArgumentTypeError("Missing or invalid default region")
+		raise ArgumentTypeError("Missing or invalid default region")
 	if not pn.is_possible_number(p):
-		raise argparse.ArgumentTypeError("Impossible phone format")
+		raise ArgumentTypeError("Impossible phone format")
 	if not pn.is_valid_number(p):
-		raise argparse.ArgumentTypeError("Invalid phone format")
+		raise ArgumentTypeError("Invalid phone format")
 	return p
+
+def username_validation(username: str) -> str:
+	if not username:
+		raise ArgumentTypeError(f"Invalid username '{username}'")
+	return username.strip()
+
+def email_validation(email: str) -> str:
+	if not email or not re.match(r"(^\s*[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+\s*$)", email):
+		raise ArgumentTypeError(f"Invalid email '{email}'")
+	return email.strip()
 
 def test_file(test: str) -> str:
 	if not test or not os.path.isfile(f"tests/{test}.html"):
-		raise argparse.ArgumentTypeError(f"Invalid test script '{test}'")
+		raise ArgumentTypeError(f"Invalid test script '{test}'")
 	return f"tests/{test}.html"
 
 def sites_validation(sites: str) -> list[str]:
@@ -44,7 +54,7 @@ def sites_validation(sites: str) -> list[str]:
 	sites_list = [site.strip() for site in sites.split(",")]
 	for site in sites_list:
 		if not re.match(r"^[a-z0-9.-]+$", site):
-			raise argparse.ArgumentTypeError(f"Invalid site '{site}'")
+			raise ArgumentTypeError(f"Invalid site '{site}'")
 	return sites_list
 
 
@@ -57,20 +67,24 @@ SITES = [
 	"github.com",
 	"quora.com"
 ]
-AUTH_WAIT_TIME = 600 # Time to wait for user to authenticate on LinkedIn (in seconds)
+AUTH_WAIT_TIME = 600 # Time to wait for user to authenticate (in seconds)
 WAIT_TIME = 15 # Time to wait for elements to load (in seconds)
 GOOGLE_WAIT_TIME = AUTH_WAIT_TIME # Time to wait for user to authenticate on Google (in seconds)
 
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(epilog="Sites to inspect:\n\t"+ ', '.join(SITES), formatter_class=argparse.RawTextHelpFormatter)
-	parser.add_argument('phone', type=phone_validation)
-	parser.add_argument('-m', '--manual', action="store_true", help="Do not automate searching, only open in default browser (do not require Selenium to be installed)")
-	parser.add_argument('-f', '--full', action="store_true", help="Do not stop at the first found result")
-	parser.add_argument('--test', type=test_file, help="Test to run")
-	parser.add_argument('--sites', type=sites_validation, help="Comma-separated list of sites to inspect. '-' or '' (empty) to inspect all sites")
-	parser.add_argument('-a', '--anonymous', action="store_true", help="Do not use any account to search (results may be limited and less accurate)")
-	parser.add_argument('-d', '--debug', action="store_true", help="Debug")
+	parser = ArgumentParser(epilog="Sites to inspect:\n\t"+ ', '.join(SITES), formatter_class=RawTextHelpFormatter)
+	
+	command_group = parser.add_mutually_exclusive_group(required=True)
+	command_group.add_argument('phone', type=phone_validation, nargs='?') #, help='Phone number to search for (in international format, e.g. +1234567890). You can also pass a username or email with the -u or -e flag respectively')
+	command_group.add_argument('-u', '--username', type=username_validation, nargs='+', help='search for a username instead')
+	# command_group.add_argument('-e', '--email', type=email_validation, nargs='+', help='search for an email instead')
+	parser.add_argument('-m', '--manual', action="store_true", help="do not automate searching, only open in default browser (do not require Selenium to be installed)")
+	parser.add_argument('-f', '--full', action="store_true", help="do not stop at the first found result")
+	parser.add_argument('--test', type=test_file, help="test to run")
+	parser.add_argument('--sites', type=sites_validation, help="comma-separated list of sites to inspect. '-' or '' (empty) to inspect all sites")
+	parser.add_argument('-a', '--anonymous', action="store_true", help="do not use any account to search (results may be limited and less accurate)")
+	parser.add_argument('-d', '--debug', action="store_true", help="debug")
 	args = parser.parse_args()
 
 
@@ -80,55 +94,62 @@ if __name__ == "__main__":
 
 	iprint("Search parameters:", args)
 
-	# National
-	phone_format_national = pn.format_number(args.phone, pn.PhoneNumberFormat.NATIONAL) #[1:]
-	phone_list = [
-		phone_format_national,
-		phone_format_national.replace(' ', '.'),
-		phone_format_national.replace(' ', ''),
+	if args.phone is not None:
+		# National
+		phone_format_national = pn.format_number(args.phone, pn.PhoneNumberFormat.NATIONAL) #[1:]
+		phone_list = [
+			phone_format_national,
+			phone_format_national.replace(' ', '.'),
+			phone_format_national.replace(' ', ''),
 
-		# Dashes and brackets popular in some regions
-		# https://en.wikipedia.org/wiki/National_conventions_for_writing_telephone_numbers
-		phone_format_national.replace('-', ''),
-		phone_format_national.replace('(', '').replace(')', ''),
-		phone_format_national.replace('-', '').replace('(', '').replace(')', ''),
-		phone_format_national.replace('-', '').replace(' ', ''),
-	]
+			# Dashes and brackets popular in some regions
+			# https://en.wikipedia.org/wiki/National_conventions_for_writing_telephone_numbers
+			phone_format_national.replace('-', ''),
+			phone_format_national.replace('(', '').replace(')', ''),
+			phone_format_national.replace('-', '').replace('(', '').replace(')', ''),
+			phone_format_national.replace('-', '').replace(' ', ''),
+		]
 
-	# International
-	phone_format_international = pn.format_number(args.phone, pn.PhoneNumberFormat.INTERNATIONAL)[1:]
-	# phone_format = re.sub(r"^(\[ \.\(\)-\]\+)", r"(\1)?( ?\(0\))?", phone_format_international.replace(' ', '[ .()-]+'))
-	# exit(1)
+		# International
+		phone_format_international = pn.format_number(args.phone, pn.PhoneNumberFormat.INTERNATIONAL)[1:]
+		# phone_format = re.sub(r"^(\[ \.\(\)-\]\+)", r"(\1)?( ?\(0\))?", phone_format_international.replace(' ', '[ .()-]+'))
+		# exit(1)
 
-	phone_list += [
-		phone_format_international,
-		phone_format_international.replace(' ', '.'),
-		phone_format_international.replace(' ', ''),
+		phone_list += [
+			phone_format_international,
+			phone_format_international.replace(' ', '.'),
+			phone_format_international.replace(' ', ''),
 
-		# Dashes and brackets popular in some regions
-		# https://en.wikipedia.org/wiki/National_conventions_for_writing_telephone_numbers
-		phone_format_international.replace('-', ''),
-		phone_format_international.replace('(', '').replace(')', ''),
-		phone_format_international.replace('-', '').replace('(', '').replace(')', ''),
-		phone_format_international.replace('-', '').replace(' ', ''),
+			# Dashes and brackets popular in some regions
+			# https://en.wikipedia.org/wiki/National_conventions_for_writing_telephone_numbers
+			phone_format_international.replace('-', ''),
+			phone_format_international.replace('(', '').replace(')', ''),
+			phone_format_international.replace('-', '').replace('(', '').replace(')', ''),
+			phone_format_international.replace('-', '').replace(' ', ''),
 
-		phone_format_international.replace(' ', ' (0)', 1),
-	]
+			phone_format_international.replace(' ', ' (0)', 1),
+		]
+
+		# print(pn.phonenumberutil.number_type(args.phone))
+		# exit(0)
+		number_type = pn.phonenumberutil.number_type(args.phone)
+		if number_type == pn.PhoneNumberType.MOBILE:
+			oprint("Mobile number")
+		elif number_type == pn.PhoneNumberType.FIXED_LINE_OR_MOBILE:
+			oprint("Mobile OR fixed-line number")
+		else:
+			wprint("Not a mobile number:", pn.PhoneNumberType.to_string(number_type),
+				"\nThis phone number isn't associated with a mobile device, so it might be less likely to be found on social media profiles or associated with a physical person.\n"
+			"You can pass the '--sites -' argument to search on all sites, which may increase the chances of finding it.")
+		
+		# iprint("Searching for phone numbers:", phone_list)
+
+	else:
+		phone_list = args.username
 
 	# Remove eventual duplicates
 	phone_list = list(set(phone_list))
-	iprint("Searching for phone numbers:", phone_list)
-	# print(pn.phonenumberutil.number_type(args.phone))
-	# exit(0)
-	number_type = pn.phonenumberutil.number_type(args.phone)
-	if number_type == pn.PhoneNumberType.MOBILE:
-		oprint("Mobile number")
-	elif number_type == pn.PhoneNumberType.FIXED_LINE_OR_MOBILE:
-		oprint("Mobile or fixed-line number")
-	else:
-		wprint("Not a mobile number:", pn.PhoneNumberType.to_string(number_type),
-        	"\nThis phone number isn't associated with a mobile device, so it might be less likely to be found on social media profiles or associated with a physical person.\n"
-         "You can pass the '--sites -' argument to search on all sites, which may increase the chances of finding it.")
+	iprint("Searching for "+ ("phone numbers" if args.phone else "usernames") +":", phone_list)
 	# exit(0)
 
 	if args.sites is not None:
@@ -170,7 +191,7 @@ if __name__ == "__main__":
 			browser = webdriver.Chrome()
 			# pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract" # Change this if tesseract is not in PATH
 			search_url = ("file://"+os.path.abspath(args.test)+"?") if args.test else ("https://www.google.com/search?"+urlencode(params))
-			country_name = geocoder.country_name_for_number(args.phone, "en").replace(" ", "").lower()
+			country_name = geocoder.country_name_for_number(args.phone, "en").replace(" ", "").lower() if args.phone else ""
 
 			def phone_number_test(text: str, phone_list: list[str], href: str, full: bool):
 				if any(phone in text for phone in phone_list):
