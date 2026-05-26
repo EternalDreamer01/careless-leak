@@ -118,6 +118,15 @@ if __name__ == "__main__":
 	# Remove eventual duplicates
 	phone_list = list(set(phone_list))
 	iprint("Searching for phone numbers:", phone_list)
+	# print(pn.phonenumberutil.number_type(args.phone))
+	# exit(0)
+	number_type = pn.phonenumberutil.number_type(args.phone)
+	if number_type == pn.PhoneNumberType.MOBILE:
+		oprint("Mobile number")
+	else:
+		wprint("Not a mobile number:", pn.PhoneNumberType.to_string(number_type),
+        	"\nThis phone number isn't associated with a mobile device, so it might be less likely to be found on social media profiles or associated with a physical person.\n"
+         "You can pass the '--sites -' argument to search on all sites, which may increase the chances of finding it.")
 	# exit(0)
 
 	if args.sites is not None:
