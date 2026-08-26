@@ -25,11 +25,22 @@ By using this project, you acknowledge and agree to abide by the principles outl
 
 ## Setup
 
+### Pip install
 ```sh
+sudo apt install tesseract-ocr
+pip install careless-leak
+```
+
+#### Manual install
+```sh
+sudo apt install tesseract-ocr # required
+
+git clone https://github.com/EternalDreamer01/careless-leak.git
+cd careless-leak
+
 pip3 install -r requirements-min.txt # for minimal, manual searching
 # OR
 pip3 install -r requirements.txt # automatic searching
-sudo apt install tesseract-ocr
 ```
 
 ### Prerequisites

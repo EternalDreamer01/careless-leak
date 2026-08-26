@@ -1,2 +1,7 @@
-tests/*
+dist/
+build/
+
+__pycache__
+*.egg-info
+
 .env

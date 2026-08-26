@@ -12,7 +12,7 @@ readme = "README.md"
 authors = [{ name = "Dimitri Simon" }]
 license = { file = "LICENSE" }
 classifiers = [
-    "License :: LGPL License",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
@@ -26,13 +26,13 @@ keywords = [
     "phone number"
 ]
 dependencies = [
-    "argparse",
     "phonenumbers",
     "selenium",
     "requests",
     "pytesseract",
-    "dotenv"
+    "python-dotenv",
 ]
+
 requires-python = ">=3.8"
 
 [project.urls]

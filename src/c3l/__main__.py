@@ -58,22 +58,20 @@ def sites_validation(sites: str) -> list[str]:
 			raise ArgumentTypeError(f"Invalid site '{site}'")
 	return sites_list
 
+def main():
+	SITES = [
+		"linkedin.com",
+		"instagram.com",
+		"facebook.com",
+		"reddit.com",
+		"twitter.com",
+		"github.com",
+		"quora.com"
+	]
+	AUTH_WAIT_TIME = 600 # Time to wait for user to authenticate (in seconds)
+	WAIT_TIME = 15 # Time to wait for elements to load (in seconds)
+	GOOGLE_WAIT_TIME = AUTH_WAIT_TIME # Time to wait for user to authenticate on Google (in seconds)
 
-SITES = [
-	"linkedin.com",
-	"instagram.com",
-	"facebook.com",
-	"reddit.com",
-	"twitter.com",
-	"github.com",
-	"quora.com"
-]
-AUTH_WAIT_TIME = 600 # Time to wait for user to authenticate (in seconds)
-WAIT_TIME = 15 # Time to wait for elements to load (in seconds)
-GOOGLE_WAIT_TIME = AUTH_WAIT_TIME # Time to wait for user to authenticate on Google (in seconds)
-
-
-if __name__ == "__main__":
 	parser = ArgumentParser(epilog="Default sites to inspect:"+ ', '.join(f'{"\n  " if (not (i % 4)) else ""}{SITES[i]}' for i in range(len(SITES))), formatter_class=RawTextHelpFormatter)
 	
 	command_group = parser.add_mutually_exclusive_group(required=True)
@@ -356,3 +354,6 @@ if __name__ == "__main__":
 
 		# while True:
 		# 	sleep(1)
+
+if __name__ == "__main__":
+    main()
