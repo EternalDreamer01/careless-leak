@@ -1,0 +1,43 @@
+# pyproject.toml
+
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "careless-leak"
+version = "0.1.0"
+description = "Reverse phone lookup based on Google Dorks"
+readme = "README.md"
+authors = [{ name = "Dimitri Simon" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: LGPL License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = [
+    "osint",
+    "reverse phone",
+    "google dorks",
+    "phone lookup",
+    "who called",
+    "caller lookup",
+    "phone number"
+]
+dependencies = [
+    "argparse",
+    "phonenumbers",
+    "selenium",
+    "requests",
+    "pytesseract",
+    "dotenv"
+]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/EternalDreamer01/careless-leak"
+
+[project.scripts]
+careless-leak-lookup = "c3l.__main__:main"
+c3l = "c3l.__main__:main"

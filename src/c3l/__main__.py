@@ -19,7 +19,8 @@ def oprint(*args, **kwargs):
 	print("\x1b[32m[+]\x1b[0m", *args, **kwargs)
 
 
-def phone_validation(ps: str) -> str:
+def phone_validation(ps: str) -> pn.PhoneNumber:
+	p = None
 	try:
 		if not ps.startswith("+"):
 			ps = "+" + ps
@@ -73,7 +74,7 @@ GOOGLE_WAIT_TIME = AUTH_WAIT_TIME # Time to wait for user to authenticate on Goo
 
 
 if __name__ == "__main__":
-	parser = ArgumentParser(epilog="Sites to inspect:\n\t"+ ', '.join(SITES), formatter_class=RawTextHelpFormatter)
+	parser = ArgumentParser(epilog="Default sites to inspect:"+ ', '.join(f'{"\n  " if (not (i % 4)) else ""}{SITES[i]}' for i in range(len(SITES))), formatter_class=RawTextHelpFormatter)
 	
 	command_group = parser.add_mutually_exclusive_group(required=True)
 	command_group.add_argument('phone', type=phone_validation, nargs='?') #, help='Phone number to search for (in international format, e.g. +1234567890). You can also pass a username or email with the -u or -e flag respectively')
@@ -181,9 +182,14 @@ if __name__ == "__main__":
 		import pytesseract
 		from dotenv import dotenv_values
 		from phonenumbers import geocoder
+		import shutil
+
 
 		browser = None
 		try:
+			if shutil.which("tesseract") is None:
+				raise RuntimeError("tesseract-ocr is required.\nInstall it with:\nsudo apt install tesseract-ocr")
+
 			iprint("Anonymous:", args.anonymous)
 
 			config = dotenv_values(".env")
@@ -335,6 +341,12 @@ if __name__ == "__main__":
 					# image_hrefs = sorted(image_hrefs, key=lambda x: x[1], reverse=True) # Sort by href
 					for title, href in image_hrefs:
 						print(f"  {title:<30} {href}")
+
+		except RuntimeError as e:
+			print()
+			eprint(e)
+			if browser:
+				browser.quit()
 
 		except KeyboardInterrupt:
 			print()
