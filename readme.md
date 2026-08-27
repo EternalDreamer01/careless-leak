@@ -27,8 +27,8 @@ By using this project, you acknowledge and agree to abide by the principles outl
 
 ### Pip install
 ```sh
-sudo apt install tesseract-ocr
-pip install careless-leak
+sudo apt install tesseract-ocr # required
+pip3 install careless-leak
 ```
 
 #### Manual install
@@ -45,7 +45,8 @@ pip3 install -r requirements.txt # automatic searching
 
 ### Prerequisites
 
-* Python 3
+* Python 3.8+
+* `tesseract-ocr`
 
 ### Setup automatic searching
 
