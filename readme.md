@@ -9,8 +9,12 @@ that is, a tool to obtain information about the subscriber (owner) of the phone 
 
 Please read [Disclaimer](#disclaimer), [Is the user notified about this ?](#is-the-user-notified-about-this-) and [Is it legal ?](#is-it-legal-).
 
+Careless Leak Lookup takes advantage of Google Dorks, to find any leaked phone (or username) online. Some people might intentionally leak their phone number online on the clear web, such circumstances include:
+* Business and employment searching (e.g, LinkedIn post),
+* Reach or reply to other people (e.g, forum, social media)
+* etc.
 
-This tool takes advantage of the unattentive leaked/published data.
+Thus, this tool takes advantage of the unattentive leaked/published data.
 The output typically consists of social media profiles.
 
 ## Disclaimer
@@ -27,14 +31,11 @@ By using this project, you acknowledge and agree to abide by the principles outl
 
 ### Pip install
 ```sh
-sudo apt install tesseract-ocr # required
 pip3 install careless-leak
 ```
 
 #### Manual install
 ```sh
-sudo apt install tesseract-ocr # required
-
 git clone https://github.com/EternalDreamer01/careless-leak.git
 cd careless-leak
 
@@ -46,7 +47,9 @@ pip3 install -r requirements.txt # automatic searching
 ### Prerequisites
 
 * Python 3.8+
-* `tesseract-ocr`
+* `tesseract-ocr`:
+  * Debian/Ubuntu: `sudo apt install tesseract-ocr`
+  * [Windows](https://tesseract-ocr.github.io/tessdoc/Downloads.html#binaries-for-windows)
 
 ### Setup automatic searching
 
